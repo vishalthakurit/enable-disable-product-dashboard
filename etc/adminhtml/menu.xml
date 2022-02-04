@@ -1,0 +1,6 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Bistro_ProductDashboard::allowip" title="Enable/Disable Products" translate="title" module="Bistro_ProductDashboard" parent="Bistro_Catalog::bistroconfig" sortOrder="50" dependsOnModule="Bistro_ProductDashboard" resource="Bistro_ProductDashboard::allowip"/>
+        <add id="Bistro_ProductDashboard::allowip_helloworld" title="Add Allow IP's" translate="title" module="Bistro_ProductDashboard" parent="Bistro_ProductDashboard::allowip" sortOrder="10" dependsOnModule="Bistro_ProductDashboard" action="adminhtml/system_config/edit/section/bristorestrictipconfugurtaion" resource="Bistro_ProductDashboard::allowip"/>
+    </menu>
+</config>

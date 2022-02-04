@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="bristorestrictipconfugurtaion" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Allow IP's Configuration</label>
+            <tab>Bistro</tab>
+            <resource>Bistro_ProductDashboard::config</resource>
+            <group id="bistro_allowip_config" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Allow Access of new Enable/Disable Product Dashboard</label>
+                <field id="allow_ips" translate="label" type="textarea" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Add Allow IP's</label>
+                    <comment>you can add multiple ip's with comma seperated.</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

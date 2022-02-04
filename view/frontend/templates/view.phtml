@@ -1,0 +1,122 @@
+<style>
+.float-parent-element{width:100%;display:inline-block;vertical-align:middle;background:#00b8ff3d;padding:10px 0}.float-child-element{float:left;width:50%}.pro_search{margin-left:50%}.new_product_grid thead{background:#000000a3;color:#fff}.access_msg{text-align:center;color:red}.store_name{padding-left: 10px;}.pro_search{padding-right: 10px;}
+</style>
+<?php if($block->allowAccess()){ ?>
+    <?php 
+    $productCollection = $block->getProductCollection();
+    if($productCollection){
+    ?>    
+        <div class="custom_product_dashboard_logo" style="width: 200px;">
+        <?php echo $this->getLayout()->createBlock("Magento\Theme\Block\Html\Header\Logo")->setTemplate("Magento_Theme::html/header/logo.phtml")->toHtml(); ?>
+        </div>
+        <div class="clear_cache" style="float: right;">
+            <strong><a href="javascript:void(0)" class="clear_magento_cache"><?php echo __("Clear Cache") ?></a></strong>
+        </div>
+        
+        <div class="float-parent-element">
+          <div class="float-child-element">
+            <div class="store_name"><span><?php echo __('Store : ') ?></span><strong><span><?php echo strtoupper($block->getStoreCode()); ?></span></strong></div>
+          </div>
+          <div class="float-child-element">
+            <div class="pro_search"><input type="text" id="myInput" placeholder="Search by Names/Sku..."></div>
+          </div>
+        </div>
+
+        <table class="new_product_grid" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th><?php echo __('Product Name') ?></th>
+                    <th><?php echo __('Product SKU') ?></th>
+                    <th><?php echo __('Price') ?></th>
+                    <th><?php echo __('Special Price') ?></th>
+                    <th><?php echo __('Status') ?></th>
+                    <th><?php echo __('Action') ?></th>
+                </tr>
+            </thead>
+     
+            <tbody id="product_table">
+                <?php 
+                foreach ($productCollection as $product) {
+                    ?>
+                    <tr class="product_id_row_<?php echo $product->getId(); ?>">
+                        <td class="pro_name"><?php echo $product->getName(); ?></td>
+                        <td class="pro_sku"><?php echo $product->getSku(); ?></td>
+                        <td class="pro_price"><?php echo number_format($product->getPrice(), 2, '.', ','); ?></td>
+                        <td class="pro_specialprice"><?php echo number_format($product->getSpecialPrice(), 2, '.', ','); ?></td>
+                        <td class="pro_status"><?php echo ($product->getStatus() == 1) ? 'Enabled' : 'Disabled'; ?></td>
+                        <td class="pro_action">
+                            <a href="javascript:void(0)" product-id="<?php echo $product->getId(); ?>" product-status="<?php echo $product->getStatus(); ?>" id="product_<?php echo $product->getId(); ?>" class="product_status_change">
+                                <?php echo ($product->getStatus() == 1) ? 'Disable' : 'Enable'; ?>
+                            </a>                        
+                        </td>
+                    </tr>
+                <?php } ?>            
+            </tbody>
+        </table>
+
+        <script>
+            require(['jquery'], function($) {
+                $(document).ready(function() {  
+                    var base_url = window.BASE_URL;
+                    // This is using for searching the products by name/sku on keyup
+                    jQuery("#myInput").on("keyup change", function(e) {
+                        var value = $(this).val().toLowerCase();
+                        $("#product_table tr").filter(function() {
+                            $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                        });
+                    });
+
+                    // this function is using for Enable/Disable the product
+                    jQuery('.product_status_change').on('click', function(){
+                        var productId = $(this).attr('product-id');
+                        var productStatus = $(this).attr('product-status');
+                        var storeCode = '<?php echo $block->getStoreCode(); ?>';
+                        $('body').trigger('processStart');
+                        $.ajax({
+                            url: base_url+'productdashboard/product/status',
+                            type: 'post',
+                            data: {product_id : productId, product_status : productStatus, storecode : storeCode },
+                            success: function (data) {
+                                $('body').trigger('processStop');
+                                if(data.type == 'success'){
+                                    var product_row = $('.product_id_row_'+data.productid);
+                                    var pro_element = product_row.find('a.product_status_change');
+                                    var pro_old_status = pro_element.attr('product-status');
+                                    var pro_new_status = (pro_old_status == 1) ? 2 : 1;
+                                    var pro_status = (pro_old_status == 1) ? 'Disabled' : 'Enabled';
+                                    var pro_status_text = (pro_old_status == 1) ? 'Enable' : 'Disable';
+                                    pro_element.attr('product-status', pro_new_status);
+                                    pro_element.text(pro_status_text);
+                                    product_row.find('td.pro_status').text(pro_status);
+                                }
+                                setTimeout(function() {
+                                    jQuery(".messages").hide('blind', {}, 500)
+                                }, 5000);
+                            }
+                        });
+                    }); 
+
+                    // This function is using for Clean the Cache
+                    jQuery('.clear_magento_cache').on('click', function(){
+                        $('body').trigger('processStart');
+                        $.ajax({
+                            url: base_url+'productdashboard/product/cacheclean',
+                            type: 'post',
+                            data: {},
+                            success: function (data) {
+                                $('body').trigger('processStop');
+                                if(data){
+                                    location.reload(true);
+                                }
+                            }
+                        });
+                    });     
+                });
+            });
+        </script>
+    <?php } else { ?>
+        <p class="access_msg"><?php echo __("No Such <strong> %1 </strong> Store Found.", $block->getStoreCode()) ?></p>
+    <?php } ?>
+<?php } else { ?>
+    <p class="access_msg"><?php echo __("you are not allow to access this page.") ?></p>
+<?php } ?>
